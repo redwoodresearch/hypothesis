@@ -611,8 +611,7 @@ def db_handle_by_name(function: Any) -> Optional[bytes]:
 
     try:
         spec = inspect.signature(function)
-        if inspect.ismethod(function):
-            del spec.args[0]
+        # signatures don't include `self` or `cls` in methods and classmethods
         hasher.update(str(spec).encode())
     except TypeError:
         pass
