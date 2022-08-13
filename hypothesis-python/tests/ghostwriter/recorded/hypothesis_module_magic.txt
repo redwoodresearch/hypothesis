@@ -67,6 +67,7 @@ def test_fuzz_seed(seed):
     suppress_health_check=st.just(not_set),
     deadline=st.just(not_set),
     print_blob=st.just(not_set),
+    max_shrink_seconds=st.just(not_set),
 )
 def test_fuzz_settings(
     parent,
@@ -80,6 +81,7 @@ def test_fuzz_settings(
     suppress_health_check,
     deadline,
     print_blob,
+    max_shrink_seconds,
 ):
     hypothesis.settings(
         parent=parent,
@@ -93,6 +95,7 @@ def test_fuzz_settings(
         suppress_health_check=suppress_health_check,
         deadline=deadline,
         print_blob=print_blob,
+        max_shrink_seconds=max_shrink_seconds,
     )
 
 
