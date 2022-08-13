@@ -12,6 +12,7 @@ import sys
 from copy import deepcopy
 from datetime import time
 from functools import partial, wraps
+import hashlib
 from inspect import Parameter, Signature, signature
 from unittest.mock import MagicMock, Mock, NonCallableMagicMock, NonCallableMock
 
@@ -23,6 +24,7 @@ from hypothesis.internal import reflection
 from hypothesis.internal.reflection import (
     convert_keyword_arguments,
     convert_positional_arguments,
+    db_handle_by_name,
     define_function_signature,
     function_digest,
     get_pretty_function_description,
@@ -227,6 +229,13 @@ def test_can_digest_a_function_with_no_name():
         pass
 
     function_digest(partial(foo, 1))
+
+
+def test_db_handle_by_name():
+    hasher = hashlib.sha384()
+    hasher.update(b"tests.cover.test_reflection::test_can_digest_a_built_in_function")
+    hasher.update(str(signature(test_can_digest_a_built_in_function)).encode())
+    assert db_handle_by_name(test_can_digest_a_built_in_function) == hasher.digest()
 
 
 def test_arg_string_is_in_order():
