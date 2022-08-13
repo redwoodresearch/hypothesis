@@ -12,6 +12,8 @@ import time
 from collections import defaultdict
 from enum import IntEnum
 from random import Random
+import traceback
+import sys
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -792,6 +794,12 @@ class ConjectureResult:
 BYTE_MASKS = [(1 << n) - 1 for n in range(8)]
 BYTE_MASKS[0] = 255
 
+_bits_drawn = 0
+
+
+def bits_drawn():
+    return _bits_drawn
+
 
 class ConjectureData:
     @classmethod
@@ -1043,6 +1051,9 @@ class ConjectureData:
         bytes. If ``forced`` is set to an integer will instead
         ignore the underlying source and simulate a draw as if it had
         returned that integer."""
+        global _bits_drawn
+        _bits_drawn += n
+
         self.__assert_not_frozen("draw_bits")
         if n == 0:
             return 0
