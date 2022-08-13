@@ -65,7 +65,8 @@ def function_digest(function):
     except AttributeError:
         pass
     try:
-        hasher.update(function.__module__.__name__.encode())
+        # __module__ is a str or None
+        hasher.update(function.__module__.encode())
     except AttributeError:
         pass
     try:
