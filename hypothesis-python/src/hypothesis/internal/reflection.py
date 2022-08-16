@@ -25,7 +25,6 @@ from tokenize import detect_encoding
 from types import ModuleType
 from typing import TYPE_CHECKING, Callable, Optional, Any
 from unittest.mock import _patch as PatchType
-import warnings
 
 from hypothesis.internal.compat import is_typed_named_tuple, update_code_location
 from hypothesis.utils.conventions import not_set
@@ -49,7 +48,39 @@ def is_mock(obj):
     return hasattr(obj, "hypothesis_internal_is_this_a_mock_check")
 
 
-def function_digest(function):
+def function_digest(function: Any) -> bytes:
+    """Like function_digest, but does not include the source."""
+    out = b""
+    try:
+        out += function.__module__.encode()
+    except AttributeError as e:
+        out += b"<unknown module>"
+    out += b"::"
+
+    try:
+        out += function.__name__.encode()
+    except AttributeError as e:
+        return old_function_digest(function)
+
+    try:
+        spec = inspect.signature(function)
+    except TypeError as e:
+        spec = None
+    except ValueError as e:
+        spec = None
+
+    if spec is not None:
+        # signatures don't include `self` or `cls` in methods and classmethods
+        out += str(spec).encode()
+
+    try:
+        out += function._hypothesis_internal_add_digest
+    except AttributeError:
+        pass
+    return out
+
+
+def old_function_digest(function):
     """Returns a string that is stable across multiple invocations across
     multiple processes and is prone to changing significantly in response to
     minor changes to the function.
@@ -597,26 +628,3 @@ def proxies(target: "T") -> Callable[[Callable], "T"]:
 def is_identity_function(f):
     # TODO: pattern-match the AST to handle `def ...` identity functions too
     return bool(re.fullmatch(r"lambda (\w+): \1", get_pretty_function_description(f)))
-
-
-def db_handle_by_name(function: Any) -> Optional[bytes]:
-    """Like function_digest, but does not include the source."""
-    hasher = hashlib.sha384()
-    try:
-        hasher.update(function.__module__.encode())
-        hasher.update(b"::")
-        hasher.update(function.__name__.encode())
-    except AttributeError:
-        return None
-
-    try:
-        spec = inspect.signature(function)
-        # signatures don't include `self` or `cls` in methods and classmethods
-        hasher.update(str(spec).encode())
-    except TypeError:
-        pass
-    try:
-        hasher.update(function._hypothesis_internal_add_digest)
-    except AttributeError:
-        pass
-    return hasher.digest()

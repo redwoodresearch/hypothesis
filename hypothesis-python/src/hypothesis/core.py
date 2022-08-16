@@ -86,7 +86,6 @@ from hypothesis.internal.escalation import (
 from hypothesis.internal.healthcheck import fail_health_check
 from hypothesis.internal.reflection import (
     convert_positional_arguments,
-    db_handle_by_name,
     define_function_signature,
     function_digest,
     get_pretty_function_description,
@@ -258,7 +257,6 @@ def _invalid(message, *, exc=InvalidArgument, test, given_kwargs):
     wrapped_test.is_hypothesis_test = True
     wrapped_test.hypothesis = HypothesisHandle(
         inner_test=test,
-        database_key=db_handle_by_name(test),
         get_fuzz_target=wrapped_test,
         given_kwargs=given_kwargs,
     )
@@ -813,9 +811,7 @@ class StateForActualGivenExecution:
             database_key = self.wrapped_test._hypothesis_internal_database_key
         except AttributeError:
             if global_force_seed is None:
-                database_key = self.wrapped_test.hypothesis.database_key
-                if database_key is None:
-                    database_key = function_digest(self.test)
+                database_key = function_digest(self.test)
             else:
                 database_key = None
 
@@ -974,10 +970,8 @@ class HypothesisHandle:
     """
 
     inner_test = attr.ib()
-    database_key = attr.ib()
     _get_fuzz_target = attr.ib()
     _given_kwargs = attr.ib()
-
 
     @property
     def fuzz_one_input(
@@ -1343,7 +1337,7 @@ def given(
         wrapped_test._hypothesis_internal_use_reproduce_failure = getattr(
             test, "_hypothesis_internal_use_reproduce_failure", None
         )
-        wrapped_test.hypothesis = HypothesisHandle(test, db_handle_by_name(test), _get_fuzz_target, given_kwargs)
+        wrapped_test.hypothesis = HypothesisHandle(test, _get_fuzz_target, given_kwargs)
         return wrapped_test
 
     return run_test_as_given
