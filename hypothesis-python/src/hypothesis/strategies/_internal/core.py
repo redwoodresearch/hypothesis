@@ -1560,23 +1560,39 @@ def _composite(f):
     return accept
 
 
-P = ParamSpec("P")
+if typing.TYPE_CHECKING or ParamSpec is not None:
+    P = ParamSpec("P")
 
-def composite(
-    f: Callable[Concatenate[DrawFn, P], Ex]
-) -> Callable[P, SearchStrategy[Ex]]:
-    """Defines a strategy that is built out of potentially arbitrarily many
-    other strategies.
+    def composite(
+        f: Callable[Concatenate[DrawFn, P], Ex]
+    ) -> Callable[P, SearchStrategy[Ex]]:
+        """Defines a strategy that is built out of potentially arbitrarily many
+        other strategies.
 
-    This is intended to be used as a decorator. See
-    :ref:`the full documentation for more details <composite-strategies>`
-    about how to use this function.
+        This is intended to be used as a decorator. See
+        :ref:`the full documentation for more details <composite-strategies>`
+        about how to use this function.
 
-    Examples from this strategy shrink by shrinking the output of each draw
-    call.
-    """
-    return _composite(f)
+        Examples from this strategy shrink by shrinking the output of each draw
+        call.
+        """
+        return _composite(f)
 
+else:  # pragma: no cover
+
+    @cacheable
+    def composite(f: Callable[..., Ex]) -> Callable[..., SearchStrategy[Ex]]:
+        """Defines a strategy that is built out of potentially arbitrarily many
+        other strategies.
+
+        This is intended to be used as a decorator. See
+        :ref:`the full documentation for more details <composite-strategies>`
+        about how to use this function.
+
+        Examples from this strategy shrink by shrinking the output of each draw
+        call.
+        """
+        return _composite(f)
 
 
 @defines_strategy(force_reusable_values=True)
