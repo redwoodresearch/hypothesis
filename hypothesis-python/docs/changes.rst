@@ -18,6 +18,34 @@ Hypothesis 6.x
 
     .. include:: ../RELEASE.rst
 
+.. _v6.54.6:
+
+-------------------
+6.54.6 - 2022-09-18
+-------------------
+
+If multiple explicit examples (from :func:`@example() <hypothesis.example>`)
+raise a Skip exception, for consistency with generated examples we now re-raise
+the first instead of collecting them into an ExceptionGroup (:issue:`3453`).
+
+.. _v6.54.5:
+
+-------------------
+6.54.5 - 2022-09-05
+-------------------
+
+This patch updates our autoformatting tools, improving our code style without any API changes.
+
+.. _v6.54.4:
+
+-------------------
+6.54.4 - 2022-08-20
+-------------------
+
+This patch fixes some type annotations for Python 3.9 and earlier (:issue:`3397`),
+and teaches :ref:`explain mode <phases>` about certain locations it should not
+bother reporting (:issue:`3439`).
+
 .. _v6.54.3:
 
 -------------------
