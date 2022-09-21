@@ -8,6 +8,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at https://mozilla.org/MPL/2.0/.
 
+import inspect
 import math
 from typing import NoReturn, Union
 
@@ -31,7 +32,9 @@ def assume(condition: object) -> bool:
     This allows you to specify properties that you *assume* will be
     true, and let Hypothesis try to avoid similar examples in future.
     """
+    caller = inspect.getframeinfo(inspect.stack()[1][0])
     if not condition:
+        event(f"Assume failed from {caller.filename}:{caller.function}:{caller.lineno}")
         raise UnsatisfiedAssumption()
     return True
 
