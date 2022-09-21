@@ -160,13 +160,6 @@ class settings(metaclass=settingsMeta):
     ) -> None:
         if parent is not None:
             check_type(settings, parent, "parent")
-        if derandomize not in (not_set, False):
-            if database not in (not_set, None):  # type: ignore
-                raise InvalidArgument(
-                    "derandomize=True implies database=None, so passing "
-                    f"database={database!r} too is invalid."
-                )
-            database = None
 
         defaults = parent or settings.default
         if defaults is not None:
