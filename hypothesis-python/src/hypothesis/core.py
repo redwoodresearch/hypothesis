@@ -773,7 +773,11 @@ class StateForActualGivenExecution:
             # These are fatal errors or control exceptions that should stop the
             # engine, so we re-raise them.
             raise
-        except failure_exceptions_to_catch() as e:
+        except BaseException as e:
+            # KeyboardInterrupt is not a test failure, rather it is a user request to stop
+            if isinstance(e, KeyboardInterrupt):
+                raise e
+
             # If the error was raised by Hypothesis-internal code, re-raise it
             # as a fatal error instead of treating it as a test failure.
             escalate_hypothesis_internal_error()
