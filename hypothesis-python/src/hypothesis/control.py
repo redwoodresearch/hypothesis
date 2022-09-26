@@ -10,7 +10,7 @@
 
 import inspect
 import math
-from typing import NoReturn, Union
+from typing import NoReturn, Optional, Union
 
 from hypothesis import Verbosity, settings
 from hypothesis.errors import InvalidArgument, UnsatisfiedAssumption
@@ -25,16 +25,19 @@ def reject() -> NoReturn:
     raise UnsatisfiedAssumption()
 
 
-def assume(condition: object) -> bool:
+def assume(condition: object, msg: Optional[str]) -> bool:
     """Calling ``assume`` is like an :ref:`assert <python:assert>` that marks
     the example as bad, rather than failing the test.
 
     This allows you to specify properties that you *assume* will be
     true, and let Hypothesis try to avoid similar examples in future.
     """
-    caller = inspect.getframeinfo(inspect.stack()[1][0])
     if not condition:
-        event(f"Assume failed from {caller.filename}:{caller.function}:{caller.lineno}")
+        if msg is None:
+            caller = inspect.getframeinfo(inspect.stack()[1][0])
+            event(f"Assume failed from {caller.filename}:{caller.function}:{caller.lineno}")
+        else:
+            event(f"Assume failed: {msg}")
         raise UnsatisfiedAssumption()
     return True
 
