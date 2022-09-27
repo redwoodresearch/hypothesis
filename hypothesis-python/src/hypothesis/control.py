@@ -11,6 +11,7 @@
 import inspect
 import math
 from typing import NoReturn, Optional, Union
+import warnings
 
 from hypothesis import Verbosity, settings
 from hypothesis.errors import InvalidArgument, UnsatisfiedAssumption
@@ -25,7 +26,7 @@ def reject() -> NoReturn:
     raise UnsatisfiedAssumption()
 
 
-def assume(condition: object, msg: Optional[str]) -> bool:
+def assume(condition: object, msg: Optional[str]=None) -> bool:
     """Calling ``assume`` is like an :ref:`assert <python:assert>` that marks
     the example as bad, rather than failing the test.
 
@@ -35,6 +36,7 @@ def assume(condition: object, msg: Optional[str]) -> bool:
     if not condition:
         if msg is None:
             caller = inspect.getframeinfo(inspect.stack()[1][0])
+            warnings.warn("assume() without a message calls `inspect.getframeinfo`, which is slow.")
             event(f"Assume failed from {caller.filename}:{caller.function}:{caller.lineno}")
         else:
             event(f"Assume failed: {msg}")
