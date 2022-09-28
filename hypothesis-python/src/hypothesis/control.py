@@ -34,12 +34,12 @@ def assume(condition: object, msg: Optional[str]=None) -> bool:
     true, and let Hypothesis try to avoid similar examples in future.
     """
     if not condition:
-        if msg is None:
-            caller = inspect.getframeinfo(inspect.stack()[1][0])
-            warnings.warn("assume() without a message calls `inspect.getframeinfo`, which is slow.")
-            event(f"Assume failed from {caller.filename}:{caller.function}:{caller.lineno}")
-        else:
-            event(f"Assume failed: {msg}")
+        # if msg is None:
+        #     caller = inspect.getframeinfo(inspect.stack()[1][0])
+        #     warnings.warn("assume() without a message calls `inspect.getframeinfo`, which is slow.")
+        #     event(f"Assume failed from {caller.filename}:{caller.function}:{caller.lineno}")
+        # else:
+        #     event(f"Assume failed: {msg}")
         raise UnsatisfiedAssumption()
     return True
 
